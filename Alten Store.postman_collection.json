@@ -1,0 +1,671 @@
+{
+	"info": {
+		"_postman_id": "02edfdca-c0e5-4990-a1b9-fa8dc6aa5511",
+		"name": "Alten Store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "14195280"
+	},
+	"item": [
+		{
+			"name": "0 - Get Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"pm.collectionVariables.set(\"jwt_token\", responseJson.token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"password456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{AUTH_URL}}/token"
+			},
+			"response": []
+		},
+		{
+			"name": "1 - Feth all products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has 5 products\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.have.lengthOf(5);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": "{{URL}}/products"
+			},
+			"response": []
+		},
+		{
+			"name": "2 - Add product with fields error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"  pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has 2 errors\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.errors).to.have.lengthOf(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"code\": \"\",\r\n    \"name\": \"\",\r\n    \"description\": \"Product Description\",\r\n    \"image\": \"gold-watch.jpg\",\r\n    \"category\": \"Accessories\",\r\n    \"price\": 115.00,\r\n    \"quantity\": 5,\r\n    \"internalReference\": \"REF-123-456\",\r\n    \"shellId\": 15,\r\n    \"inventoryStatus\": \"INSTOCK\",\r\n    \"rating\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{URL}}/products"
+			},
+			"response": []
+		},
+		{
+			"name": "3 - Add product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const moment = require('moment');\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The new product is returned in response\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.a('object')\r",
+							"    pm.expect(responseJson.id).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The new product created date is set\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(moment(responseJson.createdAt, moment.ISO_8601).isValid()).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The new product updated date is set\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(moment(responseJson.updatedAt, moment.ISO_8601).isValid()).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"code\": \"arf4658sd\",\r\n    \"name\": \"Gold Watch\",\r\n    \"description\": \"Product Description\",\r\n    \"image\": \"gold-watch.jpg\",\r\n    \"category\": \"Accessories\",\r\n    \"price\": 115.00,\r\n    \"quantity\": 5,\r\n    \"internalReference\": \"REF-123-456\",\r\n    \"shellId\": 15,\r\n    \"inventoryStatus\": \"INSTOCK\",\r\n    \"rating\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{URL}}/products"
+			},
+			"response": []
+		},
+		{
+			"name": "4 - Fetch product by Id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The product is returned in response\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.a('object')\r",
+							"    pm.expect(responseJson.id).to.equal(1003);\r",
+							"    pm.expect(responseJson.code).to.equal(\"PRD003\");\r",
+							"    pm.expect(responseJson.name).to.equal(\"Gaming Mouse\");\r",
+							"    pm.expect(responseJson.price).to.equal(39.99);\r",
+							"    pm.expect(responseJson.inventoryStatus).to.equal(\"INSTOCK\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{URL}}/products/1003"
+			},
+			"response": []
+		},
+		{
+			"name": "5 - Fetch product not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"  pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{URL}}/products/999"
+			},
+			"response": []
+		},
+		{
+			"name": "6 - Update product by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The product is returned in response\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.price).to.equal(85);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1002,\r\n    //\"code\": \"hehess\",\r\n    //\"name\": \"Gold Watch\",\r\n    //\"description\": \"Product Description\",\r\n    //\"image\": \"gold-watch.jpg\",\r\n    //\"category\": \"Accessories\",\r\n    \"price\": 85.00\r\n    //\"quantity\": 5,\r\n    //\"internalReference\": \"REF-123-456\",\r\n    //\"shellId\": 15,\r\n    //\"inventoryStatus\": \"INSTOCK\",\r\n    //\"rating\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{URL}}/products/1002"
+			},
+			"response": []
+		},
+		{
+			"name": "7 - Delete product by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"  pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "{{URL}}/products/1005"
+			},
+			"response": []
+		},
+		{
+			"name": "8 - Wish list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{URL}}/wish"
+			},
+			"response": []
+		},
+		{
+			"name": "9 - Wish list add product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": "{{URL}}/wish/1001"
+			},
+			"response": []
+		},
+		{
+			"name": "10 - Wish list remove product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "{{URL}}/wish/1003"
+			},
+			"response": []
+		},
+		{
+			"name": "11 - Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{URL}}/cart"
+			},
+			"response": []
+		},
+		{
+			"name": "12 - Cart add product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/cart?productId=1003&quantity=2",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"cart"
+					],
+					"query": [
+						{
+							"key": "productId",
+							"value": "1003"
+						},
+						{
+							"key": "quantity",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "13 - Cart update product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/cart?productId=1003&quantity=12",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"cart"
+					],
+					"query": [
+						{
+							"key": "productId",
+							"value": "1003"
+						},
+						{
+							"key": "quantity",
+							"value": "12"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "14 - Cart remove product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/cart?productId=1004&quantity=0",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"cart"
+					],
+					"query": [
+						{
+							"key": "productId",
+							"value": "1004"
+						},
+						{
+							"key": "quantity",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "15 - Cart clear",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{jwt_token}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "{{URL}}/cart"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AUTH_URL",
+			"value": "http://localhost:8080/auth",
+			"type": "string"
+		}
+	]
+}
